@@ -49,7 +49,7 @@ body
 	width:650px;
 }
 
-form.appnitro
+.appnitro
 {
 	margin:20px 20px 0;
 	padding:0 0 20px;
@@ -97,7 +97,7 @@ img
 	width:61%;
 }
 
-form ul
+.form ul
 {
 	font-size:100%;
 	list-style-type:none;
@@ -106,7 +106,7 @@ form ul
 	width:100%;
 }
 
-form li
+.form li
 {
 	display:block;
 	margin:0;
@@ -114,7 +114,7 @@ form li
 	position:relative;
 }
 
-form li:after
+.form li:after
 {
 	clear:both;
 	content:".";
@@ -139,7 +139,7 @@ form li:after
 	margin-top:10px;
 }
 
-* html form li
+* html .form li
 {
 	height:1%;
 }
@@ -149,19 +149,19 @@ form li:after
 	height:1%;
 }
 
-* html form li div
+* html .form li div
 {
 	display:inline-block;
 }
 
-form li div
+.form li div
 {
 	color:#444;
 	margin:0 4px 0 0;
 	padding:0 0 8px;
 }
 
-form li span
+.form li span
 {
 	color:#444;
 	float:left;
@@ -169,26 +169,26 @@ form li span
 	padding:0 0 8px;
 }
 
-form li div.left
+.form li div.left
 {
 	display:inline;
 	float:left;
 	width:48%;
 }
 
-form li div.right
+.form li div.right
 {
 	display:inline;
 	float:right;
 	width:48%;
 }
 
-form li div.left .medium
+.form li div.left .medium
 {
 	width:100%;
 }
 
-form li div.right .medium
+.form li div.right .medium
 {
 	width:100%;
 }
@@ -198,7 +198,7 @@ form li div.right .medium
 	clear:both;
 }
 
-form li div label
+.form li div label
 {
 	clear:both;
 	color:#444;
@@ -209,7 +209,7 @@ form li div label
 	padding-top:3px;
 }
 
-form li span label
+.form li span label
 {
 	clear:both;
 	color:#444;
@@ -220,7 +220,7 @@ form li span label
 	padding-top:3px;
 }
 
-form li .datepicker
+.form li .datepicker
 {
 	cursor:pointer !important;
 	float:left;
@@ -258,12 +258,12 @@ form li .datepicker
 	margin:0 0 12px;
 }
 
-form hr
+.form hr
 {
 	display:none;
 }
 
-form li.section_break
+.form li.section_break
 {
 	border-top:1px dotted #ccc;
 	margin-top:9px;
@@ -273,14 +273,14 @@ form li.section_break
 	width:97% !important;
 }
 
-form ul li.first
+.form ul li.first
 {
 	border-top:none !important;
 	margin-top:0 !important;
 	padding-top:0 !important;
 }
 
-form .section_break h3
+.form .section_break h3
 {
 	font-size:110%;
 	font-weight:400;
@@ -288,7 +288,7 @@ form .section_break h3
 	margin:0 0 2px;
 }
 
-form .section_break p
+.form .section_break p
 {
 	font-size:85%;
 
@@ -507,7 +507,7 @@ textarea.large
 	padding:2px 3px;
 }
 
-form li.error
+.form li.error
 {
 	background-color:#FFDFDF !important;
 	border-bottom:1px solid #EACBCC;
@@ -515,12 +515,12 @@ form li.error
 	margin:3px 0;
 }
 
-form li.error label
+.form li.error label
 {
 	color:#DF0000 !important;
 }
 
-form p.error
+.form p.error
 {
 	clear:both;
 	color:red;
@@ -529,7 +529,7 @@ form p.error
 	margin:0 0 5px;
 }
 
-form .required
+.form .required
 {
 	color:red;
 	float:none;
@@ -537,12 +537,12 @@ form .required
 }
 
 /**** Guidelines and Error Highlight ****/
-form li.highlighted
+.form li.highlighted
 {
 	background-color:#fff7c0;
 }
 
-form .guidelines
+.form .guidelines
 {
 	background:#f5f5f5;
 	border:1px solid #e6e6e6;
@@ -559,17 +559,17 @@ form .guidelines
 	z-index:1000;
 }
 
-form .guidelines small
+.form .guidelines small
 {
 	font-size:105%;
 }
 
-form li.highlighted .guidelines
+.form li.highlighted .guidelines
 {
 	visibility:visible;
 }
 
-form li:hover .guidelines
+.form li:hover .guidelines
 {
 	visibility:visible;
 }
@@ -579,7 +579,7 @@ form li:hover .guidelines
 	display:none !important;
 }
 
-.no_guidelines form li
+.no_guidelines .form li
 {
 	width:97%;
 }

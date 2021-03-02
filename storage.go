@@ -34,7 +34,12 @@ var ValueKeysName = []byte("valuekeys")
 
 func NewStorage(cfg *Config) *Storage {
 	st := &Storage{cfg: cfg, data: make(map[string]*Secret), cron: gocron.NewScheduler(time.UTC)}
-	st.cron.Every(30 * time.Minute).Do(st.clearExpired)
+	var err error
+	_, err = st.cron.Every(cfg.RunClearingInterval).Seconds().Do(st.clearExpired)
+	if err != nil {
+		log.Fatalf("Can't create cronjob: %v", err)
+	}
+	st.cron.StartAsync()
 	if cfg.PersistentStorage {
 		_ = os.Mkdir(cfg.StoragePath, 0700)
 		err, db := st.openDb()
@@ -149,6 +154,7 @@ func (s *Storage) getPersistent(id, key string) (error, string) {
 	if err != nil {
 		return err, ""
 	}
+	defer db.Close()
 	var data string
 	err = db.Update(func(tx *bbolt.Tx) error {
 		bValue := tx.Bucket(ValueKeysName)
@@ -191,6 +197,7 @@ func (s *Storage) Clear() {
 }
 
 func (s *Storage) clearExpired() {
+	log.Println("Run clearing")
 	if s.cfg.PersistentStorage {
 		s.clearExpiredPersistent()
 	} else {
@@ -201,13 +208,14 @@ func (s *Storage) clearExpired() {
 func (s *Storage) clearExpiredLocal() {
 	s.Lock()
 	defer s.Unlock()
-	expired := time.Now().Add(-24 * time.Hour)
+	expired := time.Now().Add(time.Duration(-1 * s.cfg.SecretsExpire) * time.Second)
 	keysToDelete := make([]string, 0)
 	for k, v := range s.data {
 		if v.Created.Before(expired) {
 			keysToDelete = append(keysToDelete, k)
 		}
 	}
+	log.Printf("Found %d expired secrets", len(keysToDelete))
 	for _, k := range keysToDelete {
 		delete(s.data, k)
 	}
@@ -226,11 +234,12 @@ func (s *Storage) clearExpiredPersistent() {
 		bValue := tx.Bucket(ValueKeysName)
 		timeKeysToDelete := make([][]byte, 0)
 		valueKeysToDelete := make([][]byte, 0)
-		max := []byte(time.Now().Add(-24 * time.Hour).Format(time.RFC3339))
+		max := []byte(time.Now().Add(time.Duration(-1 * s.cfg.SecretsExpire) * time.Second).Format(time.RFC3339))
 		for k, v := c.First(); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 			timeKeysToDelete = append(timeKeysToDelete, k)
 			valueKeysToDelete = append(valueKeysToDelete, v)
 		}
+		log.Printf("Found %d expired secrets", len(timeKeysToDelete))
 		for _, k := range valueKeysToDelete {
 			bValue.Delete(k)
 		}

@@ -1,4 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -7,25 +8,36 @@
     <script type="text/javascript" src="static/view.js"></script>
 
 </head>
-<body id="main_body" >
+<body id="main_body">
 
 <img id="top" src="static/top.png" alt="">
 <div id="form_container">
     <h1><a>Ephemera Link</a></h1>
-    <div class="form_description">
-        <h2>Copy link to secret:</h2>
-        <p><script type="text/javascript">document.write(window.location.href)</script>{{.link}}</p>
-        <p><button  class="button_text" onclick="copyToClp()">Copy</button></p>
+    <div class="appnitro form">
+        <div class="form_description">
+            <h2>Copy link to secret:</h2>
+            <p>
+                <script type="text/javascript">document.write(window.location.href)</script>{{.link}}
+            </p>
+        </div>
+        <ul >
+            <li class="buttons">
+                <input type="button" class="button_text" onclick="copyToClp()" value="Copy">
+            </li>
+            <li><a href="/">Create another secret</a></li>
+        </ul>
     </div>
 </div>
 <img id="bottom" src="static/bottom.png" alt="">
-<textarea id="clip" onclick="copyToClp()" style="z-index: -100; opacity: 0; width: 1px; height: 1px">{{.link}}</textarea><!-- this executes copyToClp() function on user's click -->
+<textarea id="clip" onclick="copyToClp()"
+          style="z-index: -100; opacity: 0; width: 1px; height: 1px">{{.link}}</textarea>
 <script>
     var ta = document.getElementById('clip');
     if (!ta.value.startsWith('http')) {
         ta.value = window.location.href + ta.value;
     }
-    function copyToClp(){
+
+    function copyToClp() {
         ta.focus();
         ta.select();
         console.log(document.execCommand('copy'));
