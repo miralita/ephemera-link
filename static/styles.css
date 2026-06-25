@@ -1,0 +1,74 @@
+:root {
+    --bg-color: #e3e0e8;
+    --text-color: #212529;
+    --card-bg: #f8f9fa;
+    --input-bg: #ffffff;
+    --btn-primary-bg: #0d6efd;
+    --btn-primary-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #3d3a3f;
+        --text-color: #f8f9fa;
+        --card-bg: #1e1e1e;
+        --input-bg: #2d2d2d;
+        --btn-primary-bg: #0a58ca;
+    }
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.theme-card {
+    background-color: var(--card-bg);
+    border-radius: 0.5rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.theme-form-control {
+    background-color: var(--input-bg);
+    color: var(--text-color);
+    border-color: #495057;
+}
+
+.btn-primary {
+    background-color: var(--btn-primary-bg);
+    border-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+}
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.secret-container {
+    max-width: 500px;
+    width: 100%;
+    padding: 2rem;
+}
+
+.space-mono-regular {
+  font-family: "Space Mono", monospace;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.footer {
+    padding: 1rem 0;
+    text-align: center;
+}
+
+.text-muted {
+    color: var(--text-color);
+}

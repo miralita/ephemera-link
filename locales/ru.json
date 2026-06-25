@@ -1,0 +1,18 @@
+{
+  "lang": "ru",
+  "create_secret": "Создать секрет",
+  "enter_secret": "Введите секрет:",
+  "enter_secret_note": "Секрет будет зашифрован и может быть просмотрен только один раз.",
+  "secret_created": "Секрет создан",
+  "created_note": "Он может быть просмотрен только один раз и исчезнет",
+  "copy_link_button": "Скопировать ссылку",
+  "copied": "Скопировано!",
+  "create_another_secret_button": "Создать другой секрет",
+  "view_secret": "Просмотреть секрет",
+  "show_secret_button": "Показать секрет",
+  "your_secret": "Секрет",
+  "copy_secret_button": "Скопировать секрет",
+  "error": "Ошибка",
+  "error_secret": "Этот секрет уже был просмотрен или ссылка недействительна.",
+  "create_new_secret_button": "Создать новый секрет"
+}

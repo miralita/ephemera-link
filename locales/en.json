@@ -1,0 +1,18 @@
+{
+  "lang": "en",
+  "create_secret": "Create Secret",
+  "enter_secret": "Enter your secret:",
+  "enter_secret_note": "Your secret will be encrypted and can only be viewed once.",
+  "secret_created": "Secret Created",
+  "created_note": "It can only be viewed once and will expire",
+  "copy_link_button": "Copy Link to Clipboard",
+  "copied": "Copied!",
+  "create_another_secret_button": "Create Another Secret",
+  "view_secret": "View Secret",
+  "show_secret_button": "Show Secret",
+  "your_secret": "Your Secret",
+  "copy_secret_button": "Copy Secret to Clipboard",
+  "error": "Error",
+  "error_secret": "This secret has already been viewed or the link is invalid.",
+  "create_new_secret_button": "Create New Secret"
+}

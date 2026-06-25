@@ -4,33 +4,36 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/go-co-op/gocron"
-	"go.etcd.io/bbolt"
 	"log"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/go-co-op/gocron"
+	"go.etcd.io/bbolt"
 )
 
 type Secret struct {
-	Id string
-	Secret    []byte
-	Created   time.Time
+	ID      string
+	Secret  []byte
+	Created time.Time
 }
 
 func (s *Secret) TimeKey() []byte {
-	return []byte(s.Created.Format(time.RFC3339) + s.Id)
+	return []byte(s.Created.Format(time.RFC3339) + s.ID)
 }
 
 type Storage struct {
-	cfg      *Config
-	data     map[string]*Secret
-	cron     *gocron.Scheduler
+	cfg  *Config
+	data map[string]*Secret
+	cron *gocron.Scheduler
 	sync.RWMutex
 }
 
-var TimeKeysName = []byte("timekeys")
-var ValueKeysName = []byte("valuekeys")
+var (
+	TimeKeysName  = []byte("timekeys")
+	ValueKeysName = []byte("valuekeys")
+)
 
 func NewStorage(cfg *Config) *Storage {
 	st := &Storage{cfg: cfg, data: make(map[string]*Secret), cron: gocron.NewScheduler(time.UTC)}
@@ -42,7 +45,7 @@ func NewStorage(cfg *Config) *Storage {
 	st.cron.StartAsync()
 	if cfg.PersistentStorage {
 		_ = os.Mkdir(cfg.StoragePath, 0700)
-		err, db := st.openDb()
+		db, err := st.openDB()
 		if err != nil {
 			log.Fatalf("Can't open database: %v", err)
 		}
@@ -63,26 +66,26 @@ func NewStorage(cfg *Config) *Storage {
 	return st
 }
 
-func (s *Storage) SaveSecret(secret string) (err error, id, key string) {
+func (s *Storage) SaveSecret(secret string) (id, key string, err error) {
 	key = RandString(s.cfg.KeyLength)
-	err, data := Encrypt(s.cfg.KeyPart + key, secret)
+	data, err := Encrypt(s.cfg.KeyPart+key, secret)
 	if err != nil {
 		return
 	}
 	sec := &Secret{
-		Secret:    data,
-		Created:   time.Now(),
+		Secret:  data,
+		Created: time.Now(),
 	}
 	if s.cfg.PersistentStorage {
-		err =  s.savePersistent(sec)
+		err = s.savePersistent(sec)
 	} else {
-		err =  s.saveLocal(sec)
+		err = s.saveLocal(sec)
 	}
-	id = sec.Id
+	id = sec.ID
 	return
 }
 
-func (s *Storage) openDb() (err error, db *bbolt.DB) {
+func (s *Storage) openDB() (db *bbolt.DB, err error) {
 	db, err = bbolt.Open(s.cfg.StoragePath+"/ephemera.bbolt", 0600, &bbolt.Options{Timeout: 3 * time.Second})
 	if err != nil {
 		err = fmt.Errorf("can't open database: %w", err)
@@ -92,7 +95,7 @@ func (s *Storage) openDb() (err error, db *bbolt.DB) {
 }
 
 func (s *Storage) savePersistent(secret *Secret) error {
-	err, db := s.openDb()
+	db, err := s.openDB()
 	if err != nil {
 		return err
 	}
@@ -100,22 +103,22 @@ func (s *Storage) savePersistent(secret *Secret) error {
 	return db.Update(func(tx *bbolt.Tx) error {
 		bTime := tx.Bucket(TimeKeysName)
 		bValue := tx.Bucket(ValueKeysName)
-		id := RandString(s.cfg.IdLength)
-		bId := []byte(id)
-		for bValue.Get(bId) != nil {
-			id = RandString(s.cfg.IdLength)
-			bId = []byte(id)
+		id := RandString(s.cfg.IDLength)
+		bID := []byte(id)
+		for bValue.Get(bID) != nil {
+			id = RandString(s.cfg.IDLength)
+			bID = []byte(id)
 		}
-		secret.Id = id
+		secret.ID = id
 		data, err := json.Marshal(secret)
 		if err != nil {
 			return fmt.Errorf("can't serialize data: %w", err)
 		}
-		err = bValue.Put(bId, data)
+		err = bValue.Put(bID, data)
 		if err != nil {
 			return fmt.Errorf("can't save data to database: %w", err)
 		}
-		err = bTime.Put(secret.TimeKey(), bId)
+		err = bTime.Put(secret.TimeKey(), bID)
 		if err != nil {
 			return fmt.Errorf("can't save time index: %w", err)
 		}
@@ -126,33 +129,32 @@ func (s *Storage) savePersistent(secret *Secret) error {
 func (s *Storage) saveLocal(secret *Secret) error {
 	s.Lock()
 	defer s.Unlock()
-	id := RandString(s.cfg.IdLength)
-	for _, ok := s.data[id]; ok; id = RandString(s.cfg.IdLength) {
-
+	id := RandString(s.cfg.IDLength)
+	for _, ok := s.data[id]; ok; id = RandString(s.cfg.IDLength) {
 	}
-	secret.Id = id
+	secret.ID = id
 	s.data[id] = secret
 	return nil
 }
 
-func (s *Storage) GetSecret(id, key string) (error, string) {
+func (s *Storage) GetSecret(id, key string) (string, error) {
 	var err error
 	var data string
 	if s.cfg.PersistentStorage {
-		err, data = s.getPersistent(id, key)
+		data, err = s.getPersistent(id, key)
 	} else {
-		err, data = s.getLocal(id, key)
+		data, err = s.getLocal(id, key)
 	}
 	if err != nil {
-		return err, ""
+		return "", err
 	}
-	return nil, data
+	return data, nil
 }
 
-func (s *Storage) getPersistent(id, key string) (error, string) {
-	err, db := s.openDb()
+func (s *Storage) getPersistent(id, key string) (string, error) {
+	db, err := s.openDB()
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	defer db.Close()
 	var data string
@@ -166,7 +168,7 @@ func (s *Storage) getPersistent(id, key string) (error, string) {
 		if err := json.Unmarshal(v, sec); err != nil {
 			return err
 		}
-		err, data = Decrypt(s.cfg.KeyPart + key, sec.Secret)
+		data, err = Decrypt(s.cfg.KeyPart+key, sec.Secret)
 		if err != nil {
 			return err
 		}
@@ -174,22 +176,22 @@ func (s *Storage) getPersistent(id, key string) (error, string) {
 		tx.Bucket(TimeKeysName).Delete(sec.TimeKey())
 		return nil
 	})
-	return err, data
+	return data, err
 }
 
-func (s *Storage) getLocal(id, key string) (error, string) {
+func (s *Storage) getLocal(id, key string) (string, error) {
 	s.Lock()
 	defer s.Unlock()
 	sec, ok := s.data[id]
 	if !ok {
-		return fmt.Errorf("secret not found"), ""
+		return "", fmt.Errorf("secret not found")
 	}
-	err, data := Decrypt(s.cfg.KeyPart + key, sec.Secret)
+	data, err := Decrypt(s.cfg.KeyPart+key, sec.Secret)
 	if err != nil {
-		return err, ""
+		return "", err
 	}
 	delete(s.data, id)
-	return nil, data
+	return data, nil
 }
 
 func (s *Storage) Clear() {
@@ -208,7 +210,7 @@ func (s *Storage) clearExpired() {
 func (s *Storage) clearExpiredLocal() {
 	s.Lock()
 	defer s.Unlock()
-	expired := time.Now().Add(time.Duration(-1 * s.cfg.SecretsExpire) * time.Second)
+	expired := time.Now().Add(time.Duration(-1*s.cfg.SecretsExpire) * time.Second)
 	keysToDelete := make([]string, 0)
 	for k, v := range s.data {
 		if v.Created.Before(expired) {
@@ -222,7 +224,7 @@ func (s *Storage) clearExpiredLocal() {
 }
 
 func (s *Storage) clearExpiredPersistent() {
-	err, db := s.openDb()
+	db, err := s.openDB()
 	if err != nil {
 		log.Printf("Can't open database for clearing: %v", err)
 		return
@@ -234,7 +236,7 @@ func (s *Storage) clearExpiredPersistent() {
 		bValue := tx.Bucket(ValueKeysName)
 		timeKeysToDelete := make([][]byte, 0)
 		valueKeysToDelete := make([][]byte, 0)
-		max := []byte(time.Now().Add(time.Duration(-1 * s.cfg.SecretsExpire) * time.Second).Format(time.RFC3339))
+		max := []byte(time.Now().Add(time.Duration(-1*s.cfg.SecretsExpire) * time.Second).Format(time.RFC3339))
 		for k, v := c.First(); k != nil && bytes.Compare(k, max) <= 0; k, v = c.Next() {
 			timeKeysToDelete = append(timeKeysToDelete, k)
 			valueKeysToDelete = append(valueKeysToDelete, v)
@@ -249,4 +251,3 @@ func (s *Storage) clearExpiredPersistent() {
 		return nil
 	})
 }
-

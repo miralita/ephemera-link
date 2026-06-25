@@ -6,7 +6,7 @@ import (
 )
 
 func init() {
-	rand.Seed(time.Now().UnixNano())
+	rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
@@ -18,4 +18,3 @@ func RandString(n int) string {
 	}
 	return string(b)
 }
-

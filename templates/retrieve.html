@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="auto">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ephemera Link - {{ translate "view_secret" .Language }}</title>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/favicon/site.webmanifest">
+    <!-- Styles and fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="center-container">
+      <h1 class="text-center mt-4">Ephemera Link</h1>
+      <div class="secret-container theme-card text-center">
+        <div id="secretDisplay" class="mb-4">
+          <h2 class="form-label mb-4">{{ translate "your_secret" .Language }}</h2>
+          <textarea id="copy" class="form-control theme-form-control space-mono-regular" rows="5" readonly>{{.secret}}</textarea>
+        </div>
+        <div class="d-grid gap-2">
+          <button id="copyBtn" class="btn btn-primary">{{ translate "copy_secret_button" .Language }}</button>
+          <a href="/" class="btn btn-outline-secondary">{{ translate "create_new_secret_button" .Language }}</a>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.getElementById('copyBtn').addEventListener('click', async () => {
+        const linkElement = document.getElementById('copy');
+        const linkText = linkElement.textContent.trim();
+
+        try {
+          await navigator.clipboard.writeText(linkText);
+
+          const originalText = document.getElementById('copyBtn').textContent;
+          document.getElementById('copyBtn').textContent = '{{ translate "copied" .Language }}';
+          setTimeout(() => {
+            document.getElementById('copyBtn').textContent = originalText;
+          }, 2000);
+
+        } catch (err) {
+          console.error('Failed to copy:', err);
+        }
+      });
+    </script>
+  </body>
+</html>

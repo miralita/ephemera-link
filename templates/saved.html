@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="{{ .Language }}" data-bs-theme="auto">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ephemera Link - {{ translate "secret_created" .Language }}</title>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/static/favicon/site.webmanifest">
+    <!-- Styles and fonts -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/styles.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="center-container">
+      <h1 class="text-center mt-4">Ephemera Link</h1>
+      <div class="secret-container theme-card text-center">
+        <h2 class="mb-4">{{ translate "secret_created" .Language }}</h2>
+        <p class="mb-0">{{ translate "created_note" .Language }}</p>
+        <p class="mb-4"><strong id="expire">{{.expire}}</strong></p>
+        <p class="mb-4">
+          <a id="copy" class="link-opacity-100" href="{{.link}}">{{.link}}</a>
+        </p>
+        <div class="d-grid gap-2">
+          <button id="copyBtn" class="btn btn-primary">{{ translate "copy_link_button" .Language }}</button>
+          <a href="/" class="btn btn-outline-secondary">{{ translate "create_another_secret_button" .Language }}</a>
+        </div>
+      </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      document.getElementById('copyBtn').addEventListener('click', async () => {
+        const linkElement = document.getElementById('copy');
+        const linkText = linkElement.textContent.trim();
+
+        try {
+          await navigator.clipboard.writeText(linkText);
+
+          const originalText = document.getElementById('copyBtn').textContent;
+          document.getElementById('copyBtn').textContent = '{{ translate "copied" .Language }}';
+          setTimeout(() => {
+            document.getElementById('copyBtn').textContent = originalText;
+          }, 2000);
+
+        } catch (err) {
+          console.error('Failed to copy:', err);
+        }
+      });
+    </script>
+    <script>
+      function relativeTime(seconds, locale) {
+        const now = new Date();
+        const expireDate = new Date(now.getTime() + seconds * 1000);
+
+        const formatter = new Intl.RelativeTimeFormat(locale);
+        const diffInSeconds = Math.floor((expireDate - now) / 1000);
+
+        if (diffInSeconds < 60) {
+          return formatter.format(diffInSeconds, 'second');
+        }
+
+        const diffInMinutes = Math.floor(diffInSeconds / 60);
+        if (diffInMinutes < 60) {
+          return formatter.format(diffInMinutes, 'minute');
+        }
+
+        const diffInHours = Math.floor(diffInMinutes / 60);
+        if (diffInHours < 24) {
+          return formatter.format(diffInHours, 'hour');
+        }
+
+        const diffInDays = Math.floor(diffInHours / 24);
+        return formatter.format(diffInDays, 'day');
+      }
+
+      const expireElement = document.getElementById('expire');
+      const expireSeconds = document.getElementById('expire').textContent;
+      expireElement.textContent = relativeTime(expireSeconds, '{{ translate "lang" .Language }}');
+    </script>
+  </body>
+</html>
